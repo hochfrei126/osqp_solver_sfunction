@@ -1,4 +1,4 @@
-#define S_FUNCTION_NAME  caoxing_MPC_demo_SF
+#define S_FUNCTION_NAME  caoxing_MPC_demo_SF_test_solver
 #define S_FUNCTION_LEVEL 2
 
 #include <stdio.h>

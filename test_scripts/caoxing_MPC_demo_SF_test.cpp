@@ -1,4 +1,4 @@
-#define S_FUNCTION_NAME  caoxing_MPC_demo_SF
+#define S_FUNCTION_NAME  caoxing_MPC_demo_SF_test
 #define S_FUNCTION_LEVEL 2
 
 #include <stdio.h>
@@ -79,19 +79,19 @@ static void mdlInitializeSizes(SimStruct *S)
         DECL_AND_INIT_DIMSINFO(do0);
         int_T dims_o0[2];
         do0.numDims = 2;
-        dims_o0[0] = 1;
-        dims_o0[1] = 1;
+        dims_o0[0] = 4;
+        dims_o0[1] = 4;
         do0.dims = dims_o0;
-        do0.width = 1;
+        do0.width = 16;
         if(!ssSetOutputPortDimensionInfo(S, 0, &do0)) return;
         // output dimension
         DECL_AND_INIT_DIMSINFO(do1);
         int_T dims_o1[2];
         do1.numDims = 2;
-        dims_o1[0] = 1;
-        dims_o1[1] = 1;
+        dims_o1[0] = 4;
+        dims_o1[1] = 2;
         do1.dims = dims_o1;
-        do1.width = 1;
+        do1.width = 8;
         if(!ssSetOutputPortDimensionInfo(S, 1, &do1)) return;
     }
     
@@ -154,7 +154,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
             }
         }
     }
-    // // //matrix_b, basic_state_size, controls input port 1
+    // //matrix_b, basic_state_size, controls input port 1
     Eigen::MatrixXd matrix_b = Matrix::Zero(basic_state_size, controls);
     width = ssGetInputPortWidth(S, 1);
     InputRealPtrsType uPtrs_matrix_b = ssGetInputPortRealSignalPtrs(S,1);
@@ -165,7 +165,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
             }
         }
     }
-    // // //matrix_q, basic_state_size, basic_state_size input port 2
+    // //matrix_q, basic_state_size, basic_state_size input port 2
     Eigen::MatrixXd matrix_q = Matrix::Zero(basic_state_size, basic_state_size);
     width = ssGetInputPortWidth(S, 2);
     InputRealPtrsType uPtrs_matrix_q = ssGetInputPortRealSignalPtrs(S,2);
@@ -176,7 +176,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
             }
         }
     }
-    // // matrix_r, controls, controls input port 3
+    // matrix_r, controls, controls input port 3
     Eigen::MatrixXd matrix_r = Matrix::Zero(controls, controls);
     width = ssGetInputPortWidth(S, 3);
     InputRealPtrsType uPtrs_matrix_r = ssGetInputPortRealSignalPtrs(S,3);
@@ -187,7 +187,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
             }
         }
     }
-    // // // //lower_bound, controls, 1 input port 4
+    // // //lower_bound, controls, 1 input port 4
     Eigen::MatrixXd lower_bound = Matrix::Zero(controls, 1);
     width = ssGetInputPortWidth(S, 4);
     InputRealPtrsType uPtrs_matrix_lb = ssGetInputPortRealSignalPtrs(S,4);
@@ -198,7 +198,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
             }
         }
     }
-    // // // //upper_bound, controls, 1 input port 5
+    // // //upper_bound, controls, 1 input port 5
     Eigen::MatrixXd upper_bound = Matrix::Zero(controls, 1);
     width = ssGetInputPortWidth(S, 5);
     InputRealPtrsType uPtrs_matrix_ub = ssGetInputPortRealSignalPtrs(S,5);
@@ -209,7 +209,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
             }
         }
     }
-    // // // //lower_state_bound, basic_state_size, 1 input port 6
+    // // //lower_state_bound, basic_state_size, 1 input port 6
     Eigen::MatrixXd lower_state_bound = Matrix::Zero(basic_state_size, 1);
     width = ssGetInputPortWidth(S,6);
     InputRealPtrsType uPtrs_matrix_lsb = ssGetInputPortRealSignalPtrs(S,6);
@@ -220,7 +220,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
             }
         }
     }
-    // // // // //upper_state_bound, basic_state_size,1 input port 7
+    // // // //upper_state_bound, basic_state_size,1 input port 7
     Eigen::MatrixXd upper_state_bound = Matrix::Zero(basic_state_size, 1);
     width = ssGetInputPortWidth(S, 7);
     InputRealPtrsType uPtrs_matrix_usb = ssGetInputPortRealSignalPtrs(S,7);
@@ -231,7 +231,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
             }
         }
     }
-    // // // //reference_state, basic_state_size,1 input port 8
+    // // //reference_state, basic_state_size,1 input port 8
     Eigen::MatrixXd reference_state = Matrix::Zero(basic_state_size, 1);
     width = ssGetInputPortWidth(S, 8);
     InputRealPtrsType uPtrs_matrix_ref = ssGetInputPortRealSignalPtrs(S,8);
@@ -242,7 +242,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
             }
         }
     }
-    // // // //reference_state, basic_state_size,1 input port 9
+    // // //reference_state, basic_state_size,1 input port 9
     Eigen::MatrixXd matrix_state = Matrix::Zero(basic_state_size, 1);
     width = ssGetInputPortWidth(S, 9);
     InputRealPtrsType uPtrs_matrix_state = ssGetInputPortRealSignalPtrs(S,9);
@@ -262,22 +262,38 @@ static void mdlOutputs(SimStruct *S, int_T tid)
     //mpc_eps, 1 input port 12
     InputRealPtrsType uPtrs_matrix_mpcEps = ssGetInputPortRealSignalPtrs(S,12);
     double mpc_eps = *uPtrs_matrix_mpcEps[0];
+   
+    MpcOsqp mpc_osqp_solver(matrix_a, 
+                            matrix_b, 
+                            matrix_q, 
+                            matrix_r, 
+                            matrix_state, 
+                            lower_bound,
+                            upper_bound, 
+                            lower_state_bound,
+                            upper_state_bound, 
+                            reference_state, 
+                            mpc_max_iteration, 
+                            horizon,
+                            mpc_eps);
+        // auto start_time_osqp = std::chrono::system_clock::now();
     std::vector<double> control_cmd(controls, 0);
-    // mpc_osqp_solver.Solve(&control_cmd);
+    mpc_osqp_solver.Solve(&control_cmd);
     // !!!!!!
     // need to be changed here
     // !!!!!!
-    // OSQP
-    MpcOsqp mpc_osqp_solver(matrix_a, matrix_b, matrix_q, matrix_r, matrix_state, lower_bound,
-                            upper_bound, lower_state_bound,
-                            upper_state_bound, reference_state, mpc_max_iteration, horizon,
-                            mpc_eps);
-    mpc_osqp_solver.Solve(&control_cmd);
-    std::cout<<control_cmd[0]<<std::endl<<control_cmd[1];
     real_T            *y0     = ssGetOutputPortRealSignal(S,0);
-    y0[0] = control_cmd[0];
+    y0[0] = 0;
     real_T            *y1     = ssGetOutputPortRealSignal(S,1);
-    y1[0] = control_cmd[1];
+    y1[0] = 0;
+    // y[0] = basic_state_size;
+    for(iRow=0; iRow<16; ++iRow){
+        y0[iRow] = *uPtrs_matrix_a[iRow];
+    }
+    for(iRow=0; iRow<8; ++iRow){
+        y1[iRow] = *uPtrs_matrix_b[iRow];
+    }
+    // y[0] = controls;
     
 } /* end mdlOutputs */
 
