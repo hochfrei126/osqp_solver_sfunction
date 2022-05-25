@@ -24,7 +24,7 @@
 
 //#include "Eigen/Eigen"
 #include <Eigen/Core>
-#include "osqp.h"
+#include "osqp/osqp.h"
 
 // #define S_FUNCTION_NAME  Mpc_Osqp//此处必须和文件名以及s模块对话框的名字一致
 // #define S_FUNCTION_LEVEL 2//确定s-function为level2类型
